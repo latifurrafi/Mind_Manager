@@ -1,348 +1,1080 @@
 <!DOCTYPE html>
-<html lang="en" class="bg-gray-900 text-gray-100">
+<html lang="en" class="bg-slate-900 text-slate-100">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Futuristic Task Manager</title>
+  <title>Advanced Task Management System</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
           colors: {
-            'neon-blue': '#00f5ff',
-            'neon-purple': '#bf00ff',
-            'neon-pink': '#ff0080',
-            'cyber-dark': '#0a0a0f',
-            'cyber-gray': '#1a1a2e',
+            'cyber-blue': '#0ea5e9',
+            'cyber-teal': '#14b8a6',
+            'cyber-purple': '#8b5cf6',
+            'cyber-slate': '#1e293b',
+            'cyber-gray': '#334155',
+            'neon-accent': '#06b6d4',
           },
-          boxShadow: {
-            'neon': '0 0 20px rgba(0, 245, 255, 0.5)',
-            'neon-purple': '0 0 20px rgba(191, 0, 255, 0.5)',
-            'neon-pink': '0 0 20px rgba(255, 0, 128, 0.5)',
+          animation: {
+            'fade-in': 'fadeIn 0.5s ease-in-out',
+            'slide-up': 'slideUp 0.3s ease-out',
+            'pulse-glow': 'pulseGlow 2s ease-in-out infinite',
           }
         }
       }
     }
   </script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
     
-    .font-cyber {
-      font-family: 'Orbitron', monospace;
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .font-inter { font-family: 'Inter', sans-serif; }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     
-    .glow-text {
-      text-shadow: 0 0 10px currentColor;
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
     }
     
-    .animate-pulse-slow {
-      animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 20px rgba(6, 182, 212, 0.3); }
+      50% { box-shadow: 0 0 30px rgba(6, 182, 212, 0.6); }
     }
     
-    .gradient-border {
-      background: linear-gradient(45deg, #00f5ff, #bf00ff, #ff0080, #00f5ff);
-      background-size: 400% 400%;
-      animation: gradientShift 3s ease infinite;
+    .glass-effect {
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(148, 163, 184, 0.1);
     }
     
-    @keyframes gradientShift {
-      0%, 100% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
+    .task-card {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
     
-    .task-item {
-      transition: all 0.3s ease;
-      border: 1px solid transparent;
-      background: linear-gradient(135deg, rgba(26, 26, 46, 0.8), rgba(10, 10, 15, 0.9));
-    }
-    
-    .task-item:hover {
+    .task-card:hover {
       transform: translateY(-2px);
-      border-color: #00f5ff;
-      box-shadow: 0 0 15px rgba(0, 245, 255, 0.3);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
     }
+    
+    .priority-high { border-left: 4px solid #ef4444; }
+    .priority-medium { border-left: 4px solid #f59e0b; }
+    .priority-low { border-left: 4px solid #10b981; }
+    
+    .status-completed { opacity: 0.7; }
+    .status-completed .task-title { text-decoration: line-through; }
+    
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: rgba(51, 65, 85, 0.3); border-radius: 3px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: linear-gradient(45deg, #0ea5e9, #14b8a6); border-radius: 3px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: linear-gradient(45deg, #14b8a6, #8b5cf6); }
   </style>
 </head>
 
-<body class="min-h-screen bg-gradient-to-br from-cyber-dark via-gray-900 to-cyber-gray p-6">
-  <div class="max-w-4xl mx-auto">
-    <!-- Header -->
-    <div class="text-center mb-8">
-      <h1 class="text-5xl font-cyber font-black text-transparent bg-clip-text bg-gradient-to-r from-neon-blue via-neon-purple to-neon-pink glow-text mb-2">
-        TASK MANAGER
-      </h1>
-      <p class="text-gray-400 font-cyber text-sm tracking-wider">ORGANIZE YOUR DIGITAL LIFE</p>
+<body class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 font-inter">
+  <!-- Header -->
+  <header class="glass-effect sticky top-0 z-50 border-b border-slate-700/50">
+    <div class="max-w-7xl mx-auto px-6 py-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+          <div class="w-10 h-10 bg-gradient-to-r from-cyber-blue to-cyber-teal rounded-lg flex items-center justify-center">
+            <span class="text-white font-bold text-xl">T</span>
+          </div>
+          <div>
+            <h1 class="text-2xl font-bold text-white">TaskFlow Pro</h1>
+            <p class="text-slate-400 text-sm font-mono">Advanced Task Management</p>
+          </div>
+        </div>
+        
+        <div class="flex items-center space-x-4">
+          <button id="themeToggle" class="p-2 rounded-lg bg-slate-700/50 hover:bg-slate-600/50 transition-colors">
+            <span class="text-xl">🌙</span>
+          </button>
+          <button id="exportBtn" class="px-4 py-2 bg-gradient-to-r from-cyber-purple to-cyber-blue text-white rounded-lg hover:opacity-90 transition-opacity font-medium">
+            Export
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="max-w-7xl mx-auto px-6 py-8">
+    <!-- Dashboard Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      <div class="glass-effect rounded-xl p-6 animate-fade-in">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-slate-400 text-sm font-medium">Total Tasks </p>
+            <p id="totalTasks" class="text-3xl font-bold text-white">{{ total_tasks }}</p>
+          </div>
+          <div class="w-12 h-12 bg-gradient-to-r from-cyber-blue to-cyber-teal rounded-lg flex items-center justify-center">
+            <span class="text-white text-xl">📋</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="glass-effect rounded-xl p-6 animate-fade-in">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-slate-400 text-sm font-medium">Completed</p>
+            <p id="completedTasks" class="text-3xl font-bold text-emerald-400">0</p>
+          </div>
+          <div class="w-12 h-12 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg flex items-center justify-center">
+            <span class="text-white text-xl">✅</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="glass-effect rounded-xl p-6 animate-fade-in">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-slate-400 text-sm font-medium">In Progress</p>
+            <p id="inProgressTasks" class="text-3xl font-bold text-amber-400">0</p>
+          </div>
+          <div class="w-12 h-12 bg-gradient-to-r from-amber-500 to-orange-500 rounded-lg flex items-center justify-center">
+            <span class="text-white text-xl">⏳</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="glass-effect rounded-xl p-6 animate-fade-in">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-slate-400 text-sm font-medium">High Priority</p>
+            <p id="highPriorityTasks" class="text-3xl font-bold text-red-400">0</p>
+          </div>
+          <div class="w-12 h-12 bg-gradient-to-r from-red-500 to-pink-500 rounded-lg flex items-center justify-center">
+            <span class="text-white text-xl">🔥</span>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div class="grid lg:grid-cols-2 gap-8">
-      <!-- Left Panel - Task Creation -->
-      <div class="space-y-6">
-        <!-- Add Task Form -->
-        <div class="bg-cyber-gray/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-700 shadow-neon">
-          <h2 class="text-xl font-cyber font-bold text-neon-blue mb-4 glow-text">CREATE NEW TASK</h2>
-          <form id="taskForm" class="space-y-4">
-            <div class="relative">
-              <input 
-                id="title" 
-                class="w-full p-4 bg-gray-800/50 border border-gray-600 rounded-xl text-gray-100 placeholder-gray-400 focus:border-neon-blue focus:ring-2 focus:ring-neon-blue/20 focus:outline-none transition-all font-cyber"
-                placeholder="Enter task title..."
-                required 
-              />
-            </div>
-            <div class="relative">
-              <textarea 
-                id="description" 
-                class="w-full p-4 bg-gray-800/50 border border-gray-600 rounded-xl text-gray-100 placeholder-gray-400 focus:border-neon-purple focus:ring-2 focus:ring-neon-purple/20 focus:outline-none transition-all font-cyber resize-none"
-                placeholder="Task description (optional)..."
-                rows="3"
-              ></textarea>
-            </div>
-            <button 
-              type="submit" 
-              class="w-full bg-gradient-to-r from-neon-blue to-neon-purple hover:from-neon-purple hover:to-neon-pink text-white font-cyber font-bold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-neon hover:shadow-neon-purple"
-            >
-              <span class="flex items-center justify-center space-x-2">
-                <span>ADD TASK</span>
-                <span class="text-xl">+</span>
-              </span>
+    <div class="grid lg:grid-cols-3 gap-8">
+      <!-- Left Panel - Task Creation & Filters -->
+      <div class="lg:col-span-1 space-y-6">
+        <!-- Quick Add Task -->
+        <div class="glass-effect rounded-xl p-6">
+          <h2 class="text-xl font-semibold text-white mb-4 flex items-center">
+            <span class="w-2 h-2 bg-cyber-blue rounded-full mr-3"></span>
+            Quick Add Task
+          </h2>
+          
+          <form id="quickTaskForm" class="space-y-4">
+            <input 
+              id="quickTitle" 
+              class="w-full p-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:border-cyber-blue focus:ring-2 focus:ring-cyber-blue/20 focus:outline-none transition-all"
+              placeholder="Task title..."
+              required 
+            />
+            <button type="submit" class="w-full bg-gradient-to-r from-cyber-blue to-cyber-teal text-white font-medium py-3 rounded-lg hover:opacity-90 transition-opacity">
+              Add Quick Task
             </button>
           </form>
         </div>
 
-        <!-- Controls -->
-        <div class="bg-cyber-gray/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-700">
-          <div class="space-y-4">
-            <button 
-              id="loadTasksBtn" 
-              class="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-emerald-600 hover:to-green-500 text-white font-cyber font-bold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105"
-            >
-              LOAD ALL TASKS
-            </button>
+        <!-- Advanced Task Form -->
+        <div class="glass-effect rounded-xl p-6">
+          <h2 class="text-xl font-semibold text-white mb-4 flex items-center">
+            <span class="w-2 h-2 bg-cyber-purple rounded-full mr-3"></span>
+            Create Advanced Task
+          </h2>
+          
+          <form id="advancedTaskForm" class="space-y-4">
+            <input 
+              id="title" 
+              class="w-full p-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:border-cyber-purple focus:ring-2 focus:ring-cyber-purple/20 focus:outline-none transition-all"
+              placeholder="Task title..."
+              required 
+            />
             
-            <!-- Task Count -->
-            <div class="text-center p-4 bg-gray-800/30 rounded-xl border border-gray-600">
-              <p class="text-gray-300 font-cyber">
-                <span class="text-neon-blue glow-text font-bold">TOTAL TASKS:</span> 
-                <span id="taskCount" class="text-neon-pink font-bold text-xl">0</span>
-              </p>
+            <textarea 
+              id="description" 
+              class="w-full p-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:border-cyber-purple focus:ring-2 focus:ring-cyber-purple/20 focus:outline-none transition-all resize-none"
+              placeholder="Description..."
+              rows="3"
+            ></textarea>
+            
+            <div class="grid grid-cols-2 gap-4">
+              <select id="priority" class="p-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white focus:border-cyber-purple focus:outline-none">
+                <option value="low">Low Priority</option>
+                <option value="medium">Medium Priority</option>
+                <option value="high">High Priority</option>
+              </select>
+              
+              <select id="category" class="p-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white focus:border-cyber-purple focus:outline-none">
+                <option value="work">Work</option>
+                <option value="personal">Personal</option>
+                <option value="urgent">Urgent</option>
+                <option value="project">Project</option>
+              </select>
+            </div>
+            
+            <input 
+              id="dueDate" 
+              type="datetime-local"
+              class="w-full p-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white focus:border-cyber-purple focus:ring-2 focus:ring-cyber-purple/20 focus:outline-none transition-all"
+            />
+            
+            <div class="flex items-center space-x-3">
+              <input type="checkbox" id="timeTracking" class="w-4 h-4 text-cyber-blue bg-slate-800 border-slate-600 rounded focus:ring-cyber-blue">
+              <label for="timeTracking" class="text-slate-300 text-sm">Enable time tracking</label>
+            </div>
+            
+            <button type="submit" class="w-full bg-gradient-to-r from-cyber-purple to-cyber-blue text-white font-medium py-3 rounded-lg hover:opacity-90 transition-opacity">
+              Create Advanced Task
+            </button>
+          </form>
+        </div>
+
+        <!-- Filters -->
+        <div class="glass-effect rounded-xl p-6">
+          <h2 class="text-xl font-semibold text-white mb-4 flex items-center">
+            <span class="w-2 h-2 bg-cyber-teal rounded-full mr-3"></span>
+            Filters & Actions
+          </h2>
+          
+          <div class="space-y-4">
+            <div class="grid grid-cols-2 gap-3">
+              <select id="statusFilter" class="p-2 bg-slate-800/50 border border-slate-600 rounded-lg text-white text-sm focus:border-cyber-teal focus:outline-none">
+                <option value="all">All Status</option>
+                <option value="pending">Pending</option>
+                <option value="in-progress">In Progress</option>
+                <option value="completed">Completed</option>
+              </select>
+              
+              <select id="priorityFilter" class="p-2 bg-slate-800/50 border border-slate-600 rounded-lg text-white text-sm focus:border-cyber-teal focus:outline-none">
+                <option value="all">All Priority</option>
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+              </select>
+            </div>
+            
+            <select id="categoryFilter" class="w-full p-2 bg-slate-800/50 border border-slate-600 rounded-lg text-white text-sm focus:border-cyber-teal focus:outline-none">
+              <option value="all">All Categories</option>
+              <option value="work">Work</option>
+              <option value="personal">Personal</option>
+              <option value="urgent">Urgent</option>
+              <option value="project">Project</option>
+            </select>
+            
+            <select id="sortBy" class="w-full p-2 bg-slate-800/50 border border-slate-600 rounded-lg text-white text-sm focus:border-cyber-teal focus:outline-none">
+              <option value="created">Sort by Created</option>
+              <option value="priority">Sort by Priority</option>
+              <option value="dueDate">Sort by Due Date</option>
+              <option value="title">Sort by Title</option>
+            </select>
+            
+            <div class="flex space-x-2">
+              <button id="loadTasksBtn" class="flex-1 bg-gradient-to-r from-cyber-teal to-emerald-500 text-white font-medium py-2 px-4 rounded-lg hover:opacity-90 transition-opacity text-sm">
+                Load Tasks
+              </button>
+              <button id="clearFiltersBtn" class="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition-colors text-sm">
+                Clear
+              </button>
+            </div>
+            
+            <div class="pt-2 border-t border-slate-700">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-slate-400 text-sm">Bulk Actions</span>
+                <span id="selectedCount" class="text-cyber-blue text-sm font-medium">0 selected</span>
+              </div>
+              <div class="flex space-x-2">
+                <button id="selectAllBtn" class="flex-1 bg-slate-700 text-white py-2 px-3 rounded-lg hover:bg-slate-600 transition-colors text-sm">
+                  Select All
+                </button>
+                <button id="deleteSelectedBtn" class="flex-1 bg-red-600 text-white py-2 px-3 rounded-lg hover:bg-red-700 transition-colors text-sm">
+                  Delete Selected
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Right Panel - Task List -->
-      <div class="space-y-6">
+      <!-- Right Panel - Task List & Search -->
+      <div class="lg:col-span-2 space-y-6">
         <!-- Search -->
-        <div class="bg-cyber-gray/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-700">
-          <h2 class="text-xl font-cyber font-bold text-neon-purple mb-4 glow-text">SEARCH TASKS</h2>
-          <div class="relative">
-            <input 
-              id="searchInput" 
-              class="w-full p-4 bg-gray-800/50 border border-gray-600 rounded-xl text-gray-100 placeholder-gray-400 focus:border-neon-pink focus:ring-2 focus:ring-neon-pink/20 focus:outline-none transition-all font-cyber"
-              placeholder="Search by title..."
-            />
-            <div class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400">
-              🔍
+        <div class="glass-effect rounded-xl p-6">
+          <div class="flex items-center space-x-4">
+            <div class="flex-1 relative">
+              <input 
+                id="searchInput" 
+                class="w-full p-3 pl-10 bg-slate-800/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:border-cyber-blue focus:ring-2 focus:ring-cyber-blue/20 focus:outline-none transition-all"
+                placeholder="Search tasks by title, description, or category..."
+              />
+              <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400">
+                🔍
+              </div>
             </div>
+            <button id="advancedSearchBtn" class="px-4 py-3 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition-colors">
+              Advanced
+            </button>
           </div>
         </div>
 
         <!-- Task List -->
-        <div class="bg-cyber-gray/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-700 min-h-96">
-          <h2 class="text-xl font-cyber font-bold text-neon-pink mb-4 glow-text">TASK LIST</h2>
-          <div id="taskList" class="space-y-3 max-h-96 overflow-y-auto custom-scrollbar">
-            <div class="text-center text-gray-500 font-cyber py-8">
-              No tasks loaded. Click "LOAD ALL TASKS" to view your tasks.
+        <div class="glass-effect rounded-xl p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-xl font-semibold text-white flex items-center">
+              <span class="w-2 h-2 bg-cyber-blue rounded-full mr-3"></span>
+              Task List
+            </h2>
+            <div class="flex items-center space-x-3">
+              <button id="gridViewBtn" class="p-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition-colors">
+                ⊞
+              </button>
+              <button id="listViewBtn" class="p-2 bg-cyber-blue text-white rounded-lg">
+                ☰
+              </button>
             </div>
+          </div>
+          
+          <div id="taskList" class="space-y-4 max-h-96 overflow-y-auto custom-scrollbar">
+            <div class="text-center text-slate-500 py-12">
+              <div class="text-6xl mb-4">📝</div>
+              <p class="text-lg font-medium">No tasks loaded</p>
+              <p class="text-sm">Click "Load Tasks" to view your tasks</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Task Templates -->
+        <div class="glass-effect rounded-xl p-6">
+          <h2 class="text-xl font-semibold text-white mb-4 flex items-center">
+            <span class="w-2 h-2 bg-amber-400 rounded-full mr-3"></span>
+            Quick Templates
+          </h2>
+          
+          <div class="grid grid-cols-2 gap-3">
+            <button class="template-btn p-3 bg-slate-800/50 border border-slate-600 rounded-lg text-left hover:border-cyber-blue transition-colors" data-template="meeting">
+              <div class="font-medium text-white">📅 Meeting</div>
+              <div class="text-sm text-slate-400">Schedule a meeting</div>
+            </button>
+            <button class="template-btn p-3 bg-slate-800/50 border border-slate-600 rounded-lg text-left hover:border-cyber-blue transition-colors" data-template="review">
+              <div class="font-medium text-white">📋 Code Review</div>
+              <div class="text-sm text-slate-400">Review code changes</div>
+            </button>
+            <button class="template-btn p-3 bg-slate-800/50 border border-slate-600 rounded-lg text-left hover:border-cyber-blue transition-colors" data-template="bug">
+              <div class="font-medium text-white">🐛 Bug Fix</div>
+              <div class="text-sm text-slate-400">Fix reported bug</div>
+            </button>
+            <button class="template-btn p-3 bg-slate-800/50 border border-slate-600 rounded-lg text-left hover:border-cyber-blue transition-colors" data-template="feature">
+              <div class="font-medium text-white">✨ New Feature</div>
+              <div class="text-sm text-slate-400">Implement feature</div>
+            </button>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Custom Scrollbar Styles -->
-  <style>
-    .custom-scrollbar::-webkit-scrollbar {
-      width: 8px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-track {
-      background: rgba(26, 26, 46, 0.5);
-      border-radius: 4px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: linear-gradient(45deg, #00f5ff, #bf00ff);
-      border-radius: 4px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-      background: linear-gradient(45deg, #bf00ff, #ff0080);
-    }
-  </style>
+  <!-- Notification Container -->
+  <div id="notificationContainer" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+  <!-- Task Detail Modal -->
+  <div id="taskModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="glass-effect rounded-xl p-6 w-full max-w-2xl animate-slide-up">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-semibold text-white">Task Details</h2>
+        <button id="closeModal" class="p-2 hover:bg-slate-700 rounded-lg transition-colors">
+          <span class="text-slate-400 text-xl">×</span>
+        </button>
+      </div>
+      
+      <div id="modalContent" class="space-y-4">
+        <!-- Modal content will be populated by JavaScript -->
+      </div>
+      
+      <div class="flex justify-end space-x-3 mt-6 pt-6 border-t border-slate-700">
+        <button id="editTaskBtn" class="px-4 py-2 bg-cyber-blue text-white rounded-lg hover:opacity-90 transition-opacity">
+          Edit Task
+        </button>
+        <button id="deleteTaskBtn" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+          Delete Task
+        </button>
+      </div>
+    </div>
+  </div>
 
   <script>
-    const taskForm = document.getElementById('taskForm');
-    const taskList = document.getElementById('taskList');
-    const loadTasksBtn = document.getElementById('loadTasksBtn');
-    const searchInput = document.getElementById('searchInput');
-    const taskCount = document.getElementById('taskCount');
-    let allTasks = []; // Global list of tasks for searching
+    // Global state
+    let allTasks = [];
+    let selectedTasks = new Set();
+    let currentView = 'list';
+    let currentTheme = 'dark';
 
-    const updateTaskCount = () => {
-      taskCount.textContent = allTasks.length;
+    // DOM elements
+    const elements = {
+      quickTaskForm: document.getElementById('quickTaskForm'),
+      advancedTaskForm: document.getElementById('advancedTaskForm'),
+      taskList: document.getElementById('taskList'),
+      loadTasksBtn: document.getElementById('loadTasksBtn'),
+      searchInput: document.getElementById('searchInput'),
+      statusFilter: document.getElementById('statusFilter'),
+      priorityFilter: document.getElementById('priorityFilter'),
+      categoryFilter: document.getElementById('categoryFilter'),
+      sortBy: document.getElementById('sortBy'),
+      clearFiltersBtn: document.getElementById('clearFiltersBtn'),
+      selectAllBtn: document.getElementById('selectAllBtn'),
+      deleteSelectedBtn: document.getElementById('deleteSelectedBtn'),
+      selectedCount: document.getElementById('selectedCount'),
+      exportBtn: document.getElementById('exportBtn'),
+      themeToggle: document.getElementById('themeToggle'),
+      taskModal: document.getElementById('taskModal'),
+      closeModal: document.getElementById('closeModal'),
+      gridViewBtn: document.getElementById('gridViewBtn'),
+      listViewBtn: document.getElementById('listViewBtn'),
+      // Stats
+      totalTasks: document.getElementById('totalTasks'),
+      completedTasks: document.getElementById('completedTasks'),
+      inProgressTasks: document.getElementById('inProgressTasks'),
+      highPriorityTasks: document.getElementById('highPriorityTasks'),
     };
 
+    // Utility functions
+    const showNotification = (message, type = 'info', duration = 3000) => {
+      const notification = document.createElement('div');
+      const colors = {
+        success: 'from-emerald-500 to-teal-500',
+        error: 'from-red-500 to-pink-500',
+        warning: 'from-amber-500 to-orange-500',
+        info: 'from-cyber-blue to-cyber-teal'
+      };
+      
+      notification.className = `bg-gradient-to-r ${colors[type]} text-white px-6 py-3 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 font-medium`;
+      notification.textContent = message;
+      
+      document.getElementById('notificationContainer').appendChild(notification);
+      
+      setTimeout(() => notification.style.transform = 'translateX(0)', 100);
+      setTimeout(() => {
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => notification.remove(), 300);
+      }, duration);
+    };
+
+    const updateStats = () => {
+      const total = allTasks.length;
+      const completed = allTasks.filter(task => task.status === 'completed').length;
+      const inProgress = allTasks.filter(task => task.status === 'in-progress').length;
+      const highPriority = allTasks.filter(task => task.priority === 'high').length;
+      
+      elements.totalTasks.textContent = total;
+      elements.completedTasks.textContent = completed;
+      elements.inProgressTasks.textContent = inProgress;
+      elements.highPriorityTasks.textContent = highPriority;
+    };
+
+    const formatDate = (dateString) => {
+      if (!dateString) return 'No due date';
+      const date = new Date(dateString);
+      return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    };
+
+    const getPriorityColor = (priority) => {
+      const colors = {
+        high: 'text-red-400 bg-red-500/10',
+        medium: 'text-amber-400 bg-amber-500/10',
+        low: 'text-emerald-400 bg-emerald-500/10'
+      };
+      return colors[priority] || colors.low;
+    };
+
+    const getStatusColor = (status) => {
+      const colors = {
+        pending: 'text-slate-400 bg-slate-500/10',
+        'in-progress': 'text-amber-400 bg-amber-500/10',
+        completed: 'text-emerald-400 bg-emerald-500/10'
+      };
+      return colors[status] || colors.pending;
+    };
+
+    const getCategoryIcon = (category) => {
+      const icons = {
+        work: '💼',
+        personal: '👤',
+        urgent: '🚨',
+        project: '📁'
+      };
+      return icons[category] || '📝';
+    };
+
+    // Task rendering
     const renderTasks = (tasks) => {
       if (tasks.length === 0) {
-        taskList.innerHTML = `
-          <div class="text-center text-gray-500 font-cyber py-8">
-            <div class="text-4xl mb-2">📝</div>
-            <p>No tasks found</p>
+        elements.taskList.innerHTML = `
+          <div class="text-center text-slate-500 py-12">
+            <div class="text-6xl mb-4">📝</div>
+            <p class="text-lg font-medium">No tasks found</p>
+            <p class="text-sm">Try adjusting your filters or create a new task</p>
           </div>
         `;
         return;
       }
 
-      taskList.innerHTML = '';
+      elements.taskList.innerHTML = '';
       tasks.forEach((task, index) => {
-        const li = document.createElement('div');
-        li.className = "task-item p-4 rounded-xl flex justify-between items-center group";
+        const taskElement = document.createElement('div');
+        taskElement.className = `task-card glass-effect rounded-lg p-4 border-l-4 priority-${task.priority} ${task.status === 'completed' ? 'status-completed' : ''}`;
         
-        const content = document.createElement('div');
-        content.className = "flex-1";
-        
-        const title = document.createElement('h3');
-        title.className = "font-cyber font-bold text-neon-blue text-lg mb-1";
-        title.textContent = task.title;
-        
-        const description = document.createElement('p');
-        description.className = "text-gray-400 text-sm font-cyber";
-        description.textContent = task.description || 'No description';
-        
-        content.appendChild(title);
-        content.appendChild(description);
-        
-        const deleteBtn = document.createElement('button');
-        deleteBtn.innerHTML = `
-          <span class="flex items-center space-x-2">
-            <span>DELETE</span>
-            <span>🗑️</span>
-          </span>
+        taskElement.innerHTML = `
+          <div class="flex items-start space-x-4">
+            <input type="checkbox" class="task-checkbox mt-1 w-4 h-4 text-cyber-blue bg-slate-800 border-slate-600 rounded focus:ring-cyber-blue" data-task-id="${task.id}">
+            
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="task-title font-semibold text-white text-lg truncate">${task.title}</h3>
+                <div class="flex items-center space-x-2">
+                  <span class="px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(task.priority)}">
+                    ${task.priority.toUpperCase()}
+                  </span>
+                  <span class="px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(task.status)}">
+                    ${task.status.replace('-', ' ').toUpperCase()}
+                  </span>
+                </div>
+              </div>
+              
+              ${task.description ? `<p class="text-slate-400 text-sm mb-3 line-clamp-2">${task.description}</p>` : ''}
+              
+              <div class="flex items-center justify-between text-xs text-slate-500">
+                <div class="flex items-center space-x-4">
+                  <span class="flex items-center space-x-1">
+                    <span>${getCategoryIcon(task.category)}</span>
+                    <span>${task.category}</span>
+                  </span>
+                  ${task.dueDate ? `<span>📅 ${formatDate(task.dueDate)}</span>` : ''}
+                  ${task.timeTracking ? '<span>⏱️ Time tracked</span>' : ''}
+                </div>
+                
+                <div class="flex items-center space-x-2">
+                  <button class="status-btn p-1 hover:bg-slate-700 rounded transition-colors" data-task-id="${task.id}" title="Toggle Status">
+                    ${task.status === 'completed' ? '↩️' : '✅'}
+                  </button>
+                  <button class="edit-btn p-1 hover:bg-slate-700 rounded transition-colors" data-task-id="${task.id}" title="Edit Task">
+                    ✏️
+                  </button>
+                  <button class="delete-btn p-1 hover:bg-red-600 rounded transition-colors" data-task-id="${task.id}" title="Delete Task">
+                    🗑️
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         `;
-        deleteBtn.className = "bg-gradient-to-r from-red-500 to-pink-600 hover:from-pink-600 hover:to-red-500 text-white font-cyber font-bold px-4 py-2 rounded-lg transition-all duration-300 transform hover:scale-105 opacity-0 group-hover:opacity-100";
         
-        deleteBtn.onclick = async () => {
-          // Create custom confirmation dialog
-          const confirmed = confirm("⚠️ DELETE TASK?\n\nThis action cannot be undone.");
-          if (!confirmed) return;
-          
-          try {
-            await fetch(`/api/tasks/${task.id}/`, { method: 'DELETE' });
-            // Remove from local array for immediate UI update
-            allTasks = allTasks.filter(t => t.id !== task.id);
-            renderTasks(allTasks);
-            updateTaskCount();
-            showNotification('Task deleted successfully!', 'success');
-          } catch (err) {
-            showNotification('Failed to delete task!', 'error');
-          }
-        };
-        
-        li.appendChild(content);
-        li.appendChild(deleteBtn);
-        taskList.appendChild(li);
+        elements.taskList.appendChild(taskElement);
+      });
+
+      // Add event listeners
+      document.querySelectorAll('.task-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', handleTaskSelection);
+      });
+      
+      document.querySelectorAll('.status-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => toggleTaskStatus(e.target.dataset.taskId));
+      });
+      
+      document.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => openTaskModal(e.target.dataset.taskId));
+      });
+      
+      document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => deleteTask(e.target.dataset.taskId));
       });
     };
 
+    // Task operations
     const loadTasks = async () => {
       try {
-        loadTasksBtn.textContent = 'LOADING...';
-        loadTasksBtn.disabled = true;
+        elements.loadTasksBtn.textContent = 'Loading...';
+        elements.loadTasksBtn.disabled = true;
         
-        const res = await fetch('/api/tasks/');
-        allTasks = await res.json();
-        renderTasks(allTasks);
-        updateTaskCount();
+        const response = await fetch('http://127.0.0.1:8000/api/tasks/');
+        allTasks = await response.json();
+        
+        applyFiltersAndSort();
+        updateStats();
         showNotification('Tasks loaded successfully!', 'success');
-      } catch (err) {
-        showNotification('Failed to load tasks!', 'error');
-        // For demo purposes, show some sample tasks
-        allTasks = [
-          { id: 1, title: 'Sample Task 1', description: 'This is a demo task', completed: false },
-          { id: 2, title: 'Sample Task 2', description: 'Another demo task', completed: false }
-        ];
-        renderTasks(allTasks);
-        updateTaskCount();
+      } catch (error) {
+        console.error('Error loading tasks:', error);
+           
+        applyFiltersAndSort();
+        updateStats();
+        showNotification('Demo tasks loaded (API not available)', 'warning');
       } finally {
-        loadTasksBtn.textContent = 'LOAD ALL TASKS';
-        loadTasksBtn.disabled = false;
+        elements.loadTasksBtn.textContent = 'Load Tasks';
+        elements.loadTasksBtn.disabled = false;
       }
     };
 
-    const showNotification = (message, type = 'info') => {
-      const notification = document.createElement('div');
-      const bgColor = type === 'success' ? 'from-green-500 to-emerald-600' : 
-                     type === 'error' ? 'from-red-500 to-pink-600' : 
-                     'from-neon-blue to-neon-purple';
-      
-      notification.className = `fixed top-4 right-4 bg-gradient-to-r ${bgColor} text-white font-cyber font-bold px-6 py-3 rounded-xl shadow-lg transform translate-x-full transition-transform duration-300 z-50`;
-      notification.textContent = message;
-      
-      document.body.appendChild(notification);
-      
-      setTimeout(() => {
-        notification.style.transform = 'translateX(0)';
-      }, 100);
-      
-      setTimeout(() => {
-        notification.style.transform = 'translateX(100%)';
-        setTimeout(() => {
-          document.body.removeChild(notification);
-        }, 300);
-      }, 3000);
-    };
-
-    taskForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const title = document.getElementById('title').value;
-      const description = document.getElementById('description').value;
-      
+    const createTask = async (taskData) => {
       try {
-        await fetch('/api/tasks/', {
+        const response = await fetch('/api/tasks/', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ title, description, completed: false })
+          body: JSON.stringify({
+            ...taskData,
+            id: Date.now(), // Temporary ID for demo
+            status: 'pending',
+            createdAt: new Date().toISOString()
+          })
         });
         
-        taskForm.reset();
-        showNotification('Task added successfully!', 'success');
+        const newTask = await response.json();
+        allTasks.unshift(newTask);
+        applyFiltersAndSort();
+        updateStats();
+        showNotification('Task created successfully!', 'success');
+      } catch (error) {
+        console.error('Error creating task:', error);
+        // Demo: Add task locally
+        const newTask = {
+          ...taskData,
+          id: Date.now(),
+          status: 'pending',
+          createdAt: new Date().toISOString()
+        };
+        allTasks.unshift(newTask);
+        applyFiltersAndSort();
+        updateStats();
+        showNotification('Task created (demo mode)', 'success');
+      }
+    };
+
+    const deleteTask = async (taskId) => {
+      if (!confirm('Are you sure you want to delete this task?')) return;
+      
+      try {
+        await fetch(`/api/tasks/${taskId}/`, { method: 'DELETE' });
+        allTasks = allTasks.filter(task => task.id != taskId);
+        selectedTasks.delete(taskId);
+        applyFiltersAndSort();
+        updateStats();
+        updateSelectedCount();
+        showNotification('Task deleted successfully!', 'success');
+      } catch (error) {
+        console.error('Error deleting task:', error);
+        // Demo: Delete locally
+        allTasks = allTasks.filter(task => task.id != taskId);
+        selectedTasks.delete(taskId);
+        applyFiltersAndSort();
+        updateStats();
+        updateSelectedCount();
+        showNotification('Task deleted (demo mode)', 'success');
+      }
+    };
+
+    const toggleTaskStatus = async (taskId) => {
+      const task = allTasks.find(t => t.id == taskId);
+      if (!task) return;
+      
+      const statusCycle = { 'pending': 'in-progress', 'in-progress': 'completed', 'completed': 'pending' };
+      const newStatus = statusCycle[task.status];
+      
+      try {
+        await fetch(`/api/tasks/${taskId}/`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: newStatus })
+        });
         
-        // Auto-reload tasks if they were previously loaded
-        if (allTasks.length > 0) {
-          loadTasks();
+        task.status = newStatus;
+        applyFiltersAndSort();
+        updateStats();
+        showNotification(`Task marked as ${newStatus.replace('-', ' ')}!`, 'success');
+      } catch (error) {
+        console.error('Error updating task:', error);
+        // Demo: Update locally
+        task.status = newStatus;
+        applyFiltersAndSort();
+        updateStats();
+        showNotification(`Task marked as ${newStatus.replace('-', ' ')} (demo mode)`, 'success');
+      }
+    };
+
+    // Filtering and sorting
+    const applyFiltersAndSort = () => {
+      let filteredTasks = [...allTasks];
+      
+      // Apply filters
+      const statusFilter = elements.statusFilter.value;
+      const priorityFilter = elements.priorityFilter.value;
+      const categoryFilter = elements.categoryFilter.value;
+      const searchQuery = elements.searchInput.value.toLowerCase();
+      
+      if (statusFilter !== 'all') {
+        filteredTasks = filteredTasks.filter(task => task.status === statusFilter);
+      }
+      
+      if (priorityFilter !== 'all') {
+        filteredTasks = filteredTasks.filter(task => task.priority === priorityFilter);
+      }
+      
+      if (categoryFilter !== 'all') {
+        filteredTasks = filteredTasks.filter(task => task.category === categoryFilter);
+      }
+      
+      if (searchQuery) {
+        filteredTasks = filteredTasks.filter(task => 
+          task.title.toLowerCase().includes(searchQuery) ||
+          (task.description && task.description.toLowerCase().includes(searchQuery)) ||
+          task.category.toLowerCase().includes(searchQuery)
+        );
+      }
+      
+      // Apply sorting
+      const sortBy = elements.sortBy.value;
+      filteredTasks.sort((a, b) => {
+        switch (sortBy) {
+          case 'priority':
+            const priorityOrder = { high: 3, medium: 2, low: 1 };
+            return priorityOrder[b.priority] - priorityOrder[a.priority];
+          case 'dueDate':
+            if (!a.dueDate && !b.dueDate) return 0;
+            if (!a.dueDate) return 1;
+            if (!b.dueDate) return -1;
+            return new Date(a.dueDate) - new Date(b.dueDate);
+          case 'title':
+            return a.title.localeCompare(b.title);
+          default: // created
+            return new Date(b.createdAt) - new Date(a.createdAt);
         }
-      } catch (err) {
-        showNotification('Failed to add task!', 'error');
+      });
+      
+      renderTasks(filteredTasks);
+    };
+
+    // Selection handling
+    const handleTaskSelection = (e) => {
+      const taskId = e.target.dataset.taskId;
+      if (e.target.checked) {
+        selectedTasks.add(taskId);
+      } else {
+        selectedTasks.delete(taskId);
+      }
+      updateSelectedCount();
+    };
+
+    const updateSelectedCount = () => {
+      elements.selectedCount.textContent = `${selectedTasks.size} selected`;
+    };
+
+    const selectAllTasks = () => {
+      const checkboxes = document.querySelectorAll('.task-checkbox');
+      const allSelected = selectedTasks.size === checkboxes.length;
+      
+      checkboxes.forEach(checkbox => {
+        checkbox.checked = !allSelected;
+        const taskId = checkbox.dataset.taskId;
+        if (!allSelected) {
+          selectedTasks.add(taskId);
+        } else {
+          selectedTasks.delete(taskId);
+        }
+      });
+      
+      updateSelectedCount();
+    };
+
+    const deleteSelectedTasks = async () => {
+      if (selectedTasks.size === 0) {
+        showNotification('No tasks selected', 'warning');
+        return;
+      }
+      
+      if (!confirm(`Delete ${selectedTasks.size} selected tasks?`)) return;
+      
+      try {
+        const deletePromises = Array.from(selectedTasks).map(taskId => 
+          fetch(`/api/tasks/${taskId}/`, { method: 'DELETE' })
+        );
+        await Promise.all(deletePromises);
+        
+        allTasks = allTasks.filter(task => !selectedTasks.has(task.id.toString()));
+        selectedTasks.clear();
+        applyFiltersAndSort();
+        updateStats();
+        updateSelectedCount();
+        showNotification('Selected tasks deleted successfully!', 'success');
+      } catch (error) {
+        console.error('Error deleting tasks:', error);
+        // Demo: Delete locally
+        allTasks = allTasks.filter(task => !selectedTasks.has(task.id.toString()));
+        selectedTasks.clear();
+        applyFiltersAndSort();
+        updateStats();
+        updateSelectedCount();
+        showNotification('Selected tasks deleted (demo mode)', 'success');
+      }
+    };
+
+    // Modal handling
+    const openTaskModal = (taskId) => {
+      const task = allTasks.find(t => t.id == taskId);
+      if (!task) return;
+      
+      const modalContent = document.getElementById('modalContent');
+      modalContent.innerHTML = `
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-slate-400 mb-2">Title</label>
+            <input id="modalTitle" value="${task.title}" class="w-full p-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-400 mb-2">Description</label>
+            <textarea id="modalDescription" rows="3" class="w-full p-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white resize-none">${task.description || ''}</textarea>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-slate-400 mb-2">Priority</label>
+              <select id="modalPriority" class="w-full p-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white">
+                <option value="low" ${task.priority === 'low' ? 'selected' : ''}>Low</option>
+                <option value="medium" ${task.priority === 'medium' ? 'selected' : ''}>Medium</option>
+                <option value="high" ${task.priority === 'high' ? 'selected' : ''}>High</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-400 mb-2">Status</label>
+              <select id="modalStatus" class="w-full p-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white">
+                <option value="pending" ${task.status === 'pending' ? 'selected' : ''}>Pending</option>
+                <option value="in-progress" ${task.status === 'in-progress' ? 'selected' : ''}>In Progress</option>
+                <option value="completed" ${task.status === 'completed' ? 'selected' : ''}>Completed</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-slate-400 mb-2">Category</label>
+              <select id="modalCategory" class="w-full p-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white">
+                <option value="work" ${task.category === 'work' ? 'selected' : ''}>Work</option>
+                <option value="personal" ${task.category === 'personal' ? 'selected' : ''}>Personal</option>
+                <option value="urgent" ${task.category === 'urgent' ? 'selected' : ''}>Urgent</option>
+                <option value="project" ${task.category === 'project' ? 'selected' : ''}>Project</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-400 mb-2">Due Date</label>
+              <input id="modalDueDate" type="datetime-local" value="${task.dueDate || ''}" class="w-full p-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white">
+            </div>
+          </div>
+        </div>
+      `;
+      
+      elements.taskModal.classList.remove('hidden');
+      elements.taskModal.classList.add('flex');
+      
+      // Store current task ID for editing
+      elements.taskModal.dataset.taskId = taskId;
+    };
+
+    const closeTaskModal = () => {
+      elements.taskModal.classList.add('hidden');
+      elements.taskModal.classList.remove('flex');
+    };
+
+    // Export functionality
+    const exportTasks = () => {
+      const dataStr = JSON.stringify(allTasks, null, 2);
+      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(dataBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `tasks-export-${new Date().toISOString().split('T')[0]}.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+      showNotification('Tasks exported successfully!', 'success');
+    };
+
+    // Template handling
+    const applyTemplate = (templateType) => {
+      const templates = {
+        meeting: {
+          title: 'Team Meeting',
+          description: 'Attend weekly team meeting to discuss project progress',
+          priority: 'medium',
+          category: 'work',
+          timeTracking: true
+        },
+        review: {
+          title: 'Code Review',
+          description: 'Review pull request and provide feedback',
+          priority: 'high',
+          category: 'work',
+          timeTracking: true
+        },
+        bug: {
+          title: 'Bug Fix',
+          description: 'Investigate and fix reported bug',
+          priority: 'high',
+          category: 'urgent',
+          timeTracking: true
+        },
+        feature: {
+          title: 'New Feature Implementation',
+          description: 'Implement new feature according to specifications',
+          priority: 'medium',
+          category: 'project',
+          timeTracking: true
+        }
+      };
+      
+      const template = templates[templateType];
+      if (template) {
+        document.getElementById('title').value = template.title;
+        document.getElementById('description').value = template.description;
+        document.getElementById('priority').value = template.priority;
+        document.getElementById('category').value = template.category;
+        document.getElementById('timeTracking').checked = template.timeTracking;
+        showNotification(`${templateType} template applied!`, 'success');
+      }
+    };
+
+    // Event listeners
+    elements.quickTaskForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const title = document.getElementById('quickTitle').value;
+      await createTask({
+        title,
+        description: '',
+        priority: 'medium',
+        category: 'work',
+        timeTracking: false
+      });
+      elements.quickTaskForm.reset();
+    });
+
+    elements.advancedTaskForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      await createTask({
+        title: document.getElementById('title').value,
+        description: document.getElementById('description').value,
+        priority: document.getElementById('priority').value,
+        category: document.getElementById('category').value,
+        due_date: document.getElementById('dueDate').value || null, // <- updated
+        time_tracking: document.getElementById('timeTracking').checked // <- updated
+      });
+      elements.advancedTaskForm.reset();
+    });
+
+    elements.loadTasksBtn.addEventListener('click', loadTasks);
+    elements.exportBtn.addEventListener('click', exportTasks);
+    elements.clearFiltersBtn.addEventListener('click', () => {
+      elements.statusFilter.value = 'all';
+      elements.priorityFilter.value = 'all';
+      elements.categoryFilter.value = 'all';
+      elements.searchInput.value = '';
+      elements.sortBy.value = 'created';
+      applyFiltersAndSort();
+    });
+
+    elements.selectAllBtn.addEventListener('click', selectAllTasks);
+    elements.deleteSelectedBtn.addEventListener('click', deleteSelectedTasks);
+    elements.closeModal.addEventListener('click', closeTaskModal);
+
+    // Filter and search event listeners
+    [elements.statusFilter, elements.priorityFilter, elements.categoryFilter, elements.sortBy].forEach(element => {
+      element.addEventListener('change', applyFiltersAndSort);
+    });
+
+    let searchTimeout;
+    elements.searchInput.addEventListener('input', () => {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(applyFiltersAndSort, 300);
+    });
+
+    // Template buttons
+    document.querySelectorAll('.template-btn').forEach(btn => {
+      btn.addEventListener('click', () => applyTemplate(btn.dataset.template));
+    });
+
+    // View toggle
+    elements.gridViewBtn.addEventListener('click', () => {
+      currentView = 'grid';
+      elements.gridViewBtn.classList.add('bg-cyber-blue');
+      elements.listViewBtn.classList.remove('bg-cyber-blue');
+      elements.listViewBtn.classList.add('bg-slate-700');
+      // Grid view implementation would go here
+    });
+
+    elements.listViewBtn.addEventListener('click', () => {
+      currentView = 'list';
+      elements.listViewBtn.classList.add('bg-cyber-blue');
+      elements.gridViewBtn.classList.remove('bg-cyber-blue');
+      elements.gridViewBtn.classList.add('bg-slate-700');
+    });
+
+    // Modal edit functionality
+    document.getElementById('editTaskBtn').addEventListener('click', async () => {
+      const taskId = elements.taskModal.dataset.taskId;
+      const task = allTasks.find(t => t.id == taskId);
+      if (!task) return;
+      
+      const updatedTask = {
+        ...task,
+        title: document.getElementById('modalTitle').value,
+        description: document.getElementById('modalDescription').value,
+        priority: document.getElementById('modalPriority').value,
+        status: document.getElementById('modalStatus').value,
+        category: document.getElementById('modalCategory').value,
+        dueDate: document.getElementById('modalDueDate').value || null
+      };
+      
+      try {
+        await fetch(`/api/tasks/${taskId}/`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updatedTask)
+        });
+        
+        Object.assign(task, updatedTask);
+        applyFiltersAndSort();
+        updateStats();
+        closeTaskModal();
+        showNotification('Task updated successfully!', 'success');
+      } catch (error) {
+        console.error('Error updating task:', error);
+        // Demo: Update locally
+        Object.assign(task, updatedTask);
+        applyFiltersAndSort();
+        updateStats();
+        closeTaskModal();
+        showNotification('Task updated (demo mode)', 'success');
       }
     });
 
-    loadTasksBtn.addEventListener('click', loadTasks);
+    document.getElementById('deleteTaskBtn').addEventListener('click', () => {
+      const taskId = elements.taskModal.dataset.taskId;
+      closeTaskModal();
+      deleteTask(taskId);
+    });
 
-    // Search handler with debouncing
-    let searchTimeout;
-    searchInput.addEventListener('input', () => {
-      clearTimeout(searchTimeout);
-      searchTimeout = setTimeout(() => {
-        const query = searchInput.value.toLowerCase();
-        const filtered = allTasks.filter(task =>
-          task.title.toLowerCase().includes(query) ||
-          (task.description && task.description.toLowerCase().includes(query))
-        );
-        renderTasks(filtered);
-      }, 300);
+    // Theme toggle
+    elements.themeToggle.addEventListener('click', () => {
+      currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      elements.themeToggle.innerHTML = currentTheme === 'dark' ? '🌙' : '☀️';
+      // Theme switching implementation would go here
+      showNotification(`Switched to ${currentTheme} theme`, 'info');
+    });
+
+    // Close modal on outside click
+    elements.taskModal.addEventListener('click', (e) => {
+      if (e.target === elements.taskModal) {
+        closeTaskModal();
+      }
     });
 
     // Initialize
-    updateTaskCount();
+    updateStats();
+    loadTasks();
+    showNotification('TaskFlow Pro initialized successfully!', 'success');
   </script>
 </body>
 </html>

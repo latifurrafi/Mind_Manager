@@ -8,7 +8,6 @@ class TaskViewSet(viewsets.ModelViewSet):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
 
-
 def index(request):
     total_tasks = Task.objects.count()
     return render(request, 'index.html',{

@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-gray-900 text-gray-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Futuristic Task Manager</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'neon-blue': '#00f5ff',
+            'neon-purple': '#bf00ff',
+            'neon-pink': '#ff0080',
+            'cyber-dark': '#0a0a0f',
+            'cyber-gray': '#1a1a2e',
+          },
+          boxShadow: {
+            'neon': '0 0 20px rgba(0, 245, 255, 0.5)',
+            'neon-purple': '0 0 20px rgba(191, 0, 255, 0.5)',
+            'neon-pink': '0 0 20px rgba(255, 0, 128, 0.5)',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+    
+    .font-cyber {
+      font-family: 'Orbitron', monospace;
+    }
+    
+    .glow-text {
+      text-shadow: 0 0 10px currentColor;
+    }
+    
+    .animate-pulse-slow {
+      animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    
+    .gradient-border {
+      background: linear-gradient(45deg, #00f5ff, #bf00ff, #ff0080, #00f5ff);
+      background-size: 400% 400%;
+      animation: gradientShift 3s ease infinite;
+    }
+    
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    
+    .task-item {
+      transition: all 0.3s ease;
+      border: 1px solid transparent;
+      background: linear-gradient(135deg, rgba(26, 26, 46, 0.8), rgba(10, 10, 15, 0.9));
+    }
+    
+    .task-item:hover {
+      transform: translateY(-2px);
+      border-color: #00f5ff;
+      box-shadow: 0 0 15px rgba(0, 245, 255, 0.3);
+    }
+  </style>
+</head>
+
+<body class="min-h-screen bg-gradient-to-br from-cyber-dark via-gray-900 to-cyber-gray p-6">
+  <div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <h1 class="text-5xl font-cyber font-black text-transparent bg-clip-text bg-gradient-to-r from-neon-blue via-neon-purple to-neon-pink glow-text mb-2">
+        TASK MANAGER
+      </h1>
+      <p class="text-gray-400 font-cyber text-sm tracking-wider">ORGANIZE YOUR DIGITAL LIFE</p>
+    </div>
+
+    <div class="grid lg:grid-cols-2 gap-8">
+      <!-- Left Panel - Task Creation -->
+      <div class="space-y-6">
+        <!-- Add Task Form -->
+        <div class="bg-cyber-gray/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-700 shadow-neon">
+          <h2 class="text-xl font-cyber font-bold text-neon-blue mb-4 glow-text">CREATE NEW TASK</h2>
+          <form id="taskForm" class="space-y-4">
+            <div class="relative">
+              <input 
+                id="title" 
+                class="w-full p-4 bg-gray-800/50 border border-gray-600 rounded-xl text-gray-100 placeholder-gray-400 focus:border-neon-blue focus:ring-2 focus:ring-neon-blue/20 focus:outline-none transition-all font-cyber"
+                placeholder="Enter task title..."
+                required 
+              />
+            </div>
+            <div class="relative">
+              <textarea 
+                id="description" 
+                class="w-full p-4 bg-gray-800/50 border border-gray-600 rounded-xl text-gray-100 placeholder-gray-400 focus:border-neon-purple focus:ring-2 focus:ring-neon-purple/20 focus:outline-none transition-all font-cyber resize-none"
+                placeholder="Task description (optional)..."
+                rows="3"
+              ></textarea>
+            </div>
+            <button 
+              type="submit" 
+              class="w-full bg-gradient-to-r from-neon-blue to-neon-purple hover:from-neon-purple hover:to-neon-pink text-white font-cyber font-bold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-neon hover:shadow-neon-purple"
+            >
+              <span class="flex items-center justify-center space-x-2">
+                <span>ADD TASK</span>
+                <span class="text-xl">+</span>
+              </span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Controls -->
+        <div class="bg-cyber-gray/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-700">
+          <div class="space-y-4">
+            <button 
+              id="loadTasksBtn" 
+              class="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-emerald-600 hover:to-green-500 text-white font-cyber font-bold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105"
+            >
+              LOAD ALL TASKS
+            </button>
+            
+            <!-- Task Count -->
+            <div class="text-center p-4 bg-gray-800/30 rounded-xl border border-gray-600">
+              <p class="text-gray-300 font-cyber">
+                <span class="text-neon-blue glow-text font-bold">TOTAL TASKS:</span> 
+                <span id="taskCount" class="text-neon-pink font-bold text-xl">0</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Panel - Task List -->
+      <div class="space-y-6">
+        <!-- Search -->
+        <div class="bg-cyber-gray/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-700">
+          <h2 class="text-xl font-cyber font-bold text-neon-purple mb-4 glow-text">SEARCH TASKS</h2>
+          <div class="relative">
+            <input 
+              id="searchInput" 
+              class="w-full p-4 bg-gray-800/50 border border-gray-600 rounded-xl text-gray-100 placeholder-gray-400 focus:border-neon-pink focus:ring-2 focus:ring-neon-pink/20 focus:outline-none transition-all font-cyber"
+              placeholder="Search by title..."
+            />
+            <div class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400">
+              🔍
+            </div>
+          </div>
+        </div>
+
+        <!-- Task List -->
+        <div class="bg-cyber-gray/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-700 min-h-96">
+          <h2 class="text-xl font-cyber font-bold text-neon-pink mb-4 glow-text">TASK LIST</h2>
+          <div id="taskList" class="space-y-3 max-h-96 overflow-y-auto custom-scrollbar">
+            <div class="text-center text-gray-500 font-cyber py-8">
+              No tasks loaded. Click "LOAD ALL TASKS" to view your tasks.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom Scrollbar Styles -->
+  <style>
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 8px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: rgba(26, 26, 46, 0.5);
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: linear-gradient(45deg, #00f5ff, #bf00ff);
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(45deg, #bf00ff, #ff0080);
+    }
+  </style>
+
+  <script>
+    const taskForm = document.getElementById('taskForm');
+    const taskList = document.getElementById('taskList');
+    const loadTasksBtn = document.getElementById('loadTasksBtn');
+    const searchInput = document.getElementById('searchInput');
+    const taskCount = document.getElementById('taskCount');
+    let allTasks = []; // Global list of tasks for searching
+
+    const updateTaskCount = () => {
+      taskCount.textContent = allTasks.length;
+    };
+
+    const renderTasks = (tasks) => {
+      if (tasks.length === 0) {
+        taskList.innerHTML = `
+          <div class="text-center text-gray-500 font-cyber py-8">
+            <div class="text-4xl mb-2">📝</div>
+            <p>No tasks found</p>
+          </div>
+        `;
+        return;
+      }
+
+      taskList.innerHTML = '';
+      tasks.forEach((task, index) => {
+        const li = document.createElement('div');
+        li.className = "task-item p-4 rounded-xl flex justify-between items-center group";
+        
+        const content = document.createElement('div');
+        content.className = "flex-1";
+        
+        const title = document.createElement('h3');
+        title.className = "font-cyber font-bold text-neon-blue text-lg mb-1";
+        title.textContent = task.title;
+        
+        const description = document.createElement('p');
+        description.className = "text-gray-400 text-sm font-cyber";
+        description.textContent = task.description || 'No description';
+        
+        content.appendChild(title);
+        content.appendChild(description);
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.innerHTML = `
+          <span class="flex items-center space-x-2">
+            <span>DELETE</span>
+            <span>🗑️</span>
+          </span>
+        `;
+        deleteBtn.className = "bg-gradient-to-r from-red-500 to-pink-600 hover:from-pink-600 hover:to-red-500 text-white font-cyber font-bold px-4 py-2 rounded-lg transition-all duration-300 transform hover:scale-105 opacity-0 group-hover:opacity-100";
+        
+        deleteBtn.onclick = async () => {
+          // Create custom confirmation dialog
+          const confirmed = confirm("⚠️ DELETE TASK?\n\nThis action cannot be undone.");
+          if (!confirmed) return;
+          
+          try {
+            await fetch(`/api/tasks/${task.id}/`, { method: 'DELETE' });
+            // Remove from local array for immediate UI update
+            allTasks = allTasks.filter(t => t.id !== task.id);
+            renderTasks(allTasks);
+            updateTaskCount();
+            showNotification('Task deleted successfully!', 'success');
+          } catch (err) {
+            showNotification('Failed to delete task!', 'error');
+          }
+        };
+        
+        li.appendChild(content);
+        li.appendChild(deleteBtn);
+        taskList.appendChild(li);
+      });
+    };
+
+    const loadTasks = async () => {
+      try {
+        loadTasksBtn.textContent = 'LOADING...';
+        loadTasksBtn.disabled = true;
+        
+        const res = await fetch('/api/tasks/');
+        allTasks = await res.json();
+        renderTasks(allTasks);
+        updateTaskCount();
+        showNotification('Tasks loaded successfully!', 'success');
+      } catch (err) {
+        showNotification('Failed to load tasks!', 'error');
+        // For demo purposes, show some sample tasks
+        allTasks = [
+          { id: 1, title: 'Sample Task 1', description: 'This is a demo task', completed: false },
+          { id: 2, title: 'Sample Task 2', description: 'Another demo task', completed: false }
+        ];
+        renderTasks(allTasks);
+        updateTaskCount();
+      } finally {
+        loadTasksBtn.textContent = 'LOAD ALL TASKS';
+        loadTasksBtn.disabled = false;
+      }
+    };
+
+    const showNotification = (message, type = 'info') => {
+      const notification = document.createElement('div');
+      const bgColor = type === 'success' ? 'from-green-500 to-emerald-600' : 
+                     type === 'error' ? 'from-red-500 to-pink-600' : 
+                     'from-neon-blue to-neon-purple';
+      
+      notification.className = `fixed top-4 right-4 bg-gradient-to-r ${bgColor} text-white font-cyber font-bold px-6 py-3 rounded-xl shadow-lg transform translate-x-full transition-transform duration-300 z-50`;
+      notification.textContent = message;
+      
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+      }, 100);
+      
+      setTimeout(() => {
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+          document.body.removeChild(notification);
+        }, 300);
+      }, 3000);
+    };
+
+    taskForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const title = document.getElementById('title').value;
+      const description = document.getElementById('description').value;
+      
+      try {
+        await fetch('/api/tasks/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, description, completed: false })
+        });
+        
+        taskForm.reset();
+        showNotification('Task added successfully!', 'success');
+        
+        // Auto-reload tasks if they were previously loaded
+        if (allTasks.length > 0) {
+          loadTasks();
+        }
+      } catch (err) {
+        showNotification('Failed to add task!', 'error');
+      }
+    });
+
+    loadTasksBtn.addEventListener('click', loadTasks);
+
+    // Search handler with debouncing
+    let searchTimeout;
+    searchInput.addEventListener('input', () => {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        const query = searchInput.value.toLowerCase();
+        const filtered = allTasks.filter(task =>
+          task.title.toLowerCase().includes(query) ||
+          (task.description && task.description.toLowerCase().includes(query))
+        );
+        renderTasks(filtered);
+      }, 300);
+    });
+
+    // Initialize
+    updateTaskCount();
+  </script>
+</body>
+</html>

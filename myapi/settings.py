@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'unfold',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -123,3 +124,13 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+UNFOLD = {
+    "SITE_TITLE": "Task Manager Admin",
+    "SITE_HEADER": "Task Manager Admin",
+    "SITE_ICON": "/static/favicon.ico",  # Optional favicon
+}
+
+
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'index'

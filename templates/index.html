@@ -296,6 +296,12 @@
             </div>
           </div>
         </div>
+
+        <div id="chatContainer">
+      <div id="chatMessages" class="mb-2 h-64 overflow-y-auto bg-gray-800 p-2 rounded-lg text-white text-sm"></div>
+      <input type="text" id="chatInput" placeholder="Ask something..." class="w-full px-3 py-2 rounded-md bg-gray-700 text-white" />
+    </div>
+
       </div>
 
       <!-- Right Panel - Task List & Search -->
@@ -400,6 +406,8 @@
           Delete Task
         </button>
       </div>
+      
+
     </div>
   </div>
 
@@ -1094,6 +1102,38 @@
       // Optional: show it as alert
       // alert(`Suggested priority: ${data.predicted_priority}`);
     }
+
+    const chatInput = document.getElementById('chatInput');
+    const chatMessages = document.getElementById('chatMessages');
+
+    chatInput.addEventListener('keydown', async (e) => {
+      if (e.key === 'Enter' && chatInput.value.trim()) {
+        const msg = chatInput.value.trim();
+        addChatMessage('You', msg);
+        chatInput.value = '';
+        
+        const res = await fetch('/api/chatbot/', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ message: msg }),
+        });
+
+        const data = await res.json();
+        if (data.reply) {
+          addChatMessage('AI', data.reply);
+        } else {
+          addChatMessage('AI', 'Sorry, something went wrong.');
+        }
+      }
+    });
+
+    function addChatMessage(sender, text) {
+      const msgEl = document.createElement('div');
+      msgEl.innerHTML = `<strong>${sender}:</strong> ${text}`;
+      chatMessages.appendChild(msgEl);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
 
 
     // Initialize

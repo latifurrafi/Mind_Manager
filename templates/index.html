@@ -1071,6 +1071,31 @@
       }
     });
 
+    document.getElementById('title').addEventListener('blur', predictPriority);
+    document.getElementById('description').addEventListener('blur', predictPriority);
+
+    async function predictPriority() {
+      const title = document.getElementById('title').value;
+      const description = document.getElementById('description').value;
+
+      if (title.length === 0 || description.length === 0) return;
+
+      const response = await fetch('/api/predict-priority/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ title, description }),
+      });
+
+      const data = await response.json();
+      document.getElementById('priority').value = data.predicted_priority;
+
+      // Optional: show it as alert
+      // alert(`Suggested priority: ${data.predicted_priority}`);
+    }
+
+
     // Initialize
     updateStats();
     loadTasks();

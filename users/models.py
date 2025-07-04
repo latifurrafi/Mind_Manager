@@ -1,10 +1,10 @@
 from django.db import models
 import datetime
 from django.utils import timezone
+from django.contrib.auth.models import AbstractUser
 
-class User(models.Model):
+class User(AbstractUser):
     username = models.CharField(max_length=150, unique=True)
-    password = models.CharField(max_length=50)
     email = models.EmailField(unique=True, blank=True, null=True)
     full_name = models.CharField(max_length=200, blank=True, null=True)
     is_active = models.BooleanField(default=True, blank=True, null=True)

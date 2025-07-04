@@ -15,7 +15,7 @@ import google.generativeai as genai
 
 from .models import Task
 from .serializers import TaskSerializer
-
+from .forms import CustomUserCreationForm
 
 # Load environment variables
 load_dotenv()
@@ -35,7 +35,7 @@ model = joblib.load('priority_model.joblib')
 # ----------------------------- User Auth -----------------------------------
 def register(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST)
         print("POST DATA:", request.POST)
         if form.is_valid():
             print("Form is valid!")
@@ -46,7 +46,7 @@ def register(request):
         else:
             print("Form errors:", form.errors)
     else:
-        form = UserCreationForm()
+        form = CustomUserCreationForm()
     return render(request, 'register.html', {'form': form})
 
 

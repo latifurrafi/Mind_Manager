@@ -10,7 +10,7 @@ class UserAdmin(ModelAdmin):
     list_filter = ('is_active', 'created_at')
     ordering = ('-created_at',)
     fieldsets = (
-        ("User Information", {"fields": ("username", "email", "full_name")}),
+        ("User Information", {"fields": ("username", "email", "full_name", "password",)}),
         ("Status", {"fields": ("is_active",)}),
         ("Dates", {"fields": ("created_at",)}),
     )

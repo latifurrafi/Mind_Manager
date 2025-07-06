@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-qvlqmnb!n_u$2igoevm^fv#p1!b8^i1ltxvg-2c@nv8$6^ywli
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['3.25.77.195']
 
 
 # Application definition
@@ -149,12 +149,15 @@ REST_FRAMEWORK = {
 # CORS and CSRF settings for local Docker/frontend development
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:8080",
+    "http://localhost:3000",  # frontend dev server
+    "http://3.25.77.195:8000",  # your EC2 app itself
     "http://127.0.0.1:8080",
 ]
 CORS_ALLOW_CREDENTIALS = True
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:8080",
+    "http://3.25.77.195:8000",  # your EC2 app itself
     "http://127.0.0.1:8080",
 ]
 

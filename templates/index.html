@@ -603,16 +603,29 @@
       try {
         elements.loadTasksBtn.textContent = 'Loading...';
         elements.loadTasksBtn.disabled = true;
-        
-        const response = await fetch('http://127.0.0.1:8000/api/tasks/');
-        allTasks = await response.json();
-        
+
+        const response = await fetch('http://127.0.0.1:8000/api/tasks/', {
+          credentials: 'include'
+        });
+
+        if (!response.ok) {
+          throw new Error(`API error: ${response.status} ${response.statusText}`);
+        }
+
+        const data = await response.json();
+
+        if (!Array.isArray(data)) {
+          throw new Error('API response is not an array');
+        }
+
+        allTasks = data;
         applyFiltersAndSort();
         updateStats();
         showNotification('Tasks loaded successfully!', 'success');
       } catch (error) {
         console.error('Error loading tasks:', error);
-           
+
+        allTasks = []; // fallback to empty array
         applyFiltersAndSort();
         updateStats();
         showNotification('Demo tasks loaded (API not available)', 'warning');
@@ -621,6 +634,7 @@
         elements.loadTasksBtn.disabled = false;
       }
     };
+
 
     const getCookie = (name) => {
       let cookieValue = null;

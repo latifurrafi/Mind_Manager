@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    container_name: django_app
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    volumes:
+      - .:/app  # This is key — it exposes your local SQLite and code to the container
+    command: python manage.py runserver 0.0.0.0:8080
